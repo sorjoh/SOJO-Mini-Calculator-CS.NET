@@ -357,7 +357,7 @@ namespace SOJO_Mini_Calculator
             DisplayTable.PerformLayout();
             ControlAdded += new ControlEventHandler(Main_ControlAdded);
             KeyPress += new KeyPressEventHandler(Main_KeyPress);
-            KeyDown += new KeyEventHandler(frmMain_KeyDown);
+            KeyDown += new KeyEventHandler(Main_KeyDown);
             Load += new EventHandler(Main_Load);
             ResumeLayout(false);
 

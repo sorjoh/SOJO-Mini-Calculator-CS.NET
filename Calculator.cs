@@ -1,134 +1,77 @@
 ﻿
 namespace SOJO_Mini_Calculator
 {
+    /// <summary>
+    /// **********************************************************************************************************************************************
+    /// 
+    /// Calculator Class
+    /// 
+    /// **********************************************************************************************************************************************
+    /// </summary>
+
     public class Calculator
-    {
-        // ========= OPERATORS =========
-        public enum Operators
+   {
+        /// <summary>
+        /// ========= OPERATORS =========
+        /// </summary>
+        public enum Operator
         {
             PLUS,
             MINUS,
             MULTIPLY,
             DIVIDE,
-
             NONE
         }
 
-
-        // ========= GET OPERATOR SIGN =========
-        public static object getOperationSign(Operators op)
+        /// <summary>
+        /// ========= GET OPERATOR SIGN =========        
+        /// </summary>
+        /// <param name="op"></param>
+        /// <returns></returns>
+        public static string GetOperationSign(Operator op)
         {
-            string sign = "";
-
-            switch (op)
-            {
-                case Operators.PLUS:
-                    {
-                        sign = "+";
-                        break;
-                    }
-                case Operators.MINUS:
-                    {
-                        sign = "-";
-                        break;
-                    }
-                case Operators.MULTIPLY:
-                    {
-                        sign = "×";
-                        break;
-                    }
-                case Operators.DIVIDE:
-                    {
-                        sign = "÷";
-                        break;
-                    }
-            }
-
-            return sign;
+            return op switch {
+                Operator.PLUS => "+",
+                Operator.MINUS => "-",
+                Operator.MULTIPLY => "×",
+                Operator.DIVIDE => "÷",
+                Operator.NONE => "",
+                _ => ""
+            };
         }
 
-
-        // ========= GET OPERATOR =========
-        public static object getOperation(string key)
+        /// <summary>
+        /// ========= GET OPERATOR =========
+        /// </summary>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public static Operator GetOperation(string key)
         {
-            Operators operation;
-
-            switch (key ?? "")
-            {
-                case "+":
-                    {
-                        operation = Operators.PLUS;
-                        break;
-                    }
-                case "−":
-                case "-":
-                    {
-                        operation = Operators.MINUS;
-                        break;
-                    }
-                case "×":
-                case "*":
-                case "x":
-                case "X":
-                    {
-                        operation = Operators.MULTIPLY;
-                        break;
-                    }
-                case "÷":
-                case "/":
-                    {
-                        operation = Operators.DIVIDE;
-                        break;
-                    }
-
-                default:
-                    {
-                        operation = Operators.NONE;
-                        break;
-                    }
-            }
-
-            return operation;
+            return key switch {
+                "+" => Operator.PLUS,
+                "−" or "-" => Operator.MINUS,
+                "×" or "*" or "x" or "X" => Operator.MULTIPLY,
+                "÷" or "/" => Operator.DIVIDE,
+                _ => Operator.NONE
+            };
         }
 
-
-        // ========= CALCULATE RESULT =========
-        public static double Calculate(double firstValue, double secondValue, Operators operation)
+        /// <summary>
+        /// ========= CALCULATE RESULT =========
+        /// </summary>
+        /// <param name="firstValue"></param>
+        /// <param name="secondValue"></param>
+        /// <param name="operation"></param>
+        /// <returns></returns>
+        public static double Calculate(double firstValue, double secondValue, Operator operation)
         {
-            double result = 0d;
-
-            switch (operation)
-            {
-                case Operators.PLUS:
-                    {
-                        result = firstValue + secondValue;
-                        break;
-                    }
-                case Operators.MINUS:
-                    {
-                        result = firstValue - secondValue;
-                        break;
-                    }
-                case Operators.MULTIPLY:
-                    {
-                        result = firstValue * secondValue;
-                        break;
-                    }
-                case Operators.DIVIDE:
-                    {
-                        result = firstValue / secondValue;
-                        break;
-                    }
-
-                default:
-                    {
-                        result = firstValue;
-                        break;
-                    }
-            }
-
-            return result;
+            return operation switch {
+                Operator.PLUS => firstValue + secondValue,
+                Operator.MINUS => firstValue - secondValue,
+                Operator.MULTIPLY => firstValue * secondValue,
+                Operator.DIVIDE => firstValue / secondValue,
+                _ => firstValue
+            };            
         }
-
     }
 }
