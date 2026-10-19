@@ -1,4 +1,4 @@
-# SOJO Mini Calculator (VB.NET)
+# SOJO Mini Calculator (C#.NET)
 
 This project is a simple mini calculator with basic mathematical operations developed in C#.NET.
 
