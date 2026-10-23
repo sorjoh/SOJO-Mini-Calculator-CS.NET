@@ -140,7 +140,11 @@ namespace SOJO_Mini_Calculator
                 outputValue = inputValue;
             } else if (hasOperator) {
                 string[] splittedOutputValue = outputValue.Split(Conversions.ToChar(Calculator.GetOperationSign(currentOperator)));
-                inputValue += inputKey;
+
+                if (inputValue == "0")
+                    inputValue = inputKey;
+                else
+                    inputValue += inputKey;                
 
                 string currentResultValue = splittedOutputValue[0];
 
