@@ -56,6 +56,8 @@ namespace SOJO_Mini_Calculator
         private string inputValue;
         private string outputValue;
 
+        private bool isEqual; //Bugfix for 2.3 + 5 = .
+
         // Get decimal seperator
         private static readonly string DECIMAL_SEPARATOR = System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 
@@ -158,6 +160,8 @@ namespace SOJO_Mini_Calculator
                 outputValue = inputValue;
             }
 
+            isEqual = false; //Bugfix for 2.3 + 5 = .
+
             DisplayOutput(outputValue);
 
             if (_DEBUG)
@@ -181,7 +185,12 @@ namespace SOJO_Mini_Calculator
                     inputValue = splittedOutputValue[1];
                 } else {
                     outputValue = "";
-                    inputValue = splittedOutputValue[0];
+
+                    //Bugfix for 2.3 + 5 = .
+                    if (isEqual)
+                        inputValue = "";
+                    else
+                        inputValue = splittedOutputValue[0];
                 }
 
                 if (!inputValue.Contains(DECIMAL_SEPARATOR)) {
@@ -193,7 +202,9 @@ namespace SOJO_Mini_Calculator
                 inputValue = "0" + inputValue;
 
             outputValue += inputValue;
-                        
+
+            isEqual = false; //Bugfix for 2.3 + 5 = .
+
             DisplayOutput(outputValue);
 
             if (_DEBUG)
@@ -249,7 +260,9 @@ namespace SOJO_Mini_Calculator
             }
 
             hasOperator = true;
-                        
+
+            isEqual = false; //Bugfix for 2.3 + 5 = .
+
             DisplayOutput(outputValue);
 
             if (_DEBUG)
@@ -289,7 +302,9 @@ namespace SOJO_Mini_Calculator
             currentOperator = Calculator.Operator.NONE;
             hasOperator = false;
             hasResult = false;
-                        
+
+            isEqual = true; //Bugfix for 2.3 + 5 = .
+
             DisplayOutput(outputValue);
 
             if (_DEBUG)
@@ -430,7 +445,9 @@ namespace SOJO_Mini_Calculator
 
             if (_DEBUG)
                 Debug.Print(Conversions.ToString(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject("Delete(after) : inputValue=" + inputValue + ", outputValue=" + outputValue + ", Display=" + Display.Text + ", currentOperation=", Calculator.GetOperationSign(currentOperator)), ", hasResult="), hasResult)));
-                        
+
+            isEqual = false; //Bugfix for 2.3 + 5 = .
+
             DisplayOutput(outputValue);
         }
 
@@ -450,6 +467,8 @@ namespace SOJO_Mini_Calculator
 
             inputValue = "";
             outputValue = "";
+
+            isEqual = false; //Bugfix for 2.3 + 5 = .
         }
 
 
