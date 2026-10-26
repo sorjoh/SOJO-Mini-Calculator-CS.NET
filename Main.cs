@@ -209,7 +209,6 @@ namespace SOJO_Mini_Calculator
             // Equal button has not been pressed
             calc.isEqual = false;
 
-
             // Display the output
             DisplayOutput(calc.outputValue);
 
@@ -227,33 +226,49 @@ namespace SOJO_Mini_Calculator
             if (_DEBUG)        
                 Debug.Print("Operator(before) : button=" + btn.Text + ", inputValue=" + calc.inputValue + ", outputValue=" + calc.outputValue + ", Display=" + Display.Text + ", currentOperation=" + calc.GetOperationSign(calc.currentOperator) + ", hasResult=" + calc.hasResult + ", hasOperator=" + calc.hasOperator);
 
+            // Save current operator as previous operator
             var previousOperator = calc.currentOperator;
 
-            if (calc.hasOperator) {
+            // 
+            if (calc.hasOperator) { // Calculation has operator
+                // Get first and second value from the output
                 string[] splitOutputValue = calc.outputValue.Split(Conversions.ToChar(calc.GetOperationSign(previousOperator)));
 
+                // Reset values
                 calc.ResetValues();
 
+                // Set output value to the first split output value
                 calc.outputValue = splitOutputValue[0];
+                // Set input value to the second split output value
                 calc.inputValue = splitOutputValue[1];
 
+                // Add minus sign in the beginning if current output value is empty and previous operator is minus 
                 if (previousOperator == Calculator.Operator.MINUS & string.IsNullOrEmpty(calc.outputValue)) {
                     calc.outputValue = calc.GetOperationSign(Calculator.Operator.MINUS) + splitOutputValue[1];
                     calc.inputValue = splitOutputValue[2];
                 }
 
+                // Set firstValue as double value of outputValue
                 double.TryParse(calc.outputValue, out calc.firstValue);
-                double.TryParse(calc.inputValue, out calc.secondValue);               
+                // Set secondValue as double value of inputValue
+                double.TryParse(calc.inputValue, out calc.secondValue);
 
-                // Fix for example 12 * %
-                if (calc.secondValue != 0.0)
+                // Calculate the result if second value is present
+                if (calc.secondValue != 0.0) {
+                    // Calculate the result
                     calc.resultValue = calc.Calculate(calc.firstValue, calc.secondValue, previousOperator);
-                else
+                } else {
+                    // Set result value to the first value
                     calc.resultValue = calc.firstValue;
+                }
 
+                // Get the current operator
                 calc.currentOperator = calc.GetOperation(btn.Text);
 
+                // Set input value to an empty string
                 calc.inputValue = "";
+
+
                 calc.outputValue = calc.resultValue + calc.GetOperationSign(calc.currentOperator);
             } else if (string.IsNullOrEmpty(calc.outputValue)) {
                 calc.ResetValues();
