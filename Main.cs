@@ -43,7 +43,7 @@ namespace SOJO_Mini_Calculator
         // Variable for Calculator methods and variables
         Calculator calc;
 
-        // Get decimal seperator
+        // Get decimal separator
         private static readonly string DECIMAL_SEPARATOR = System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
 
         /// <summary>
@@ -122,34 +122,44 @@ namespace SOJO_Mini_Calculator
             if (_DEBUG)                
                 Debug.Print("Number(before) : button=" + btn.Text + ", inputValue=" + calc.inputValue + ", outputValue=" + calc.outputValue + ", Display=" + Display.Text + ", currentOperation=" + calc.GetOperationSign(calc.currentOperator) + ", hasResult=" + calc.hasResult + ", hasOperator=" + calc.hasOperator);
 
+            // Get the number
             string inputKey = btn.Text;
 
-            if (calc.hasResult) {
+            if (calc.hasResult) { // Calculation has result
+                // Reset all values
                 calc.ResetValues();
+                // Add the first number to inputValue
                 calc.inputValue = inputKey;
-                calc.outputValue = calc.inputValue;
-            } else if (calc.hasOperator) {
+                // Replace outputValue with the newly and initialized inputValue
+                calc.outputValue = calc.inputValue; 
+            } else if (calc.hasOperator) { // Calculation has operator
+                // Get first and second value from the output
                 string[] splitOutputValue = calc.outputValue.Split(Conversions.ToChar(calc.GetOperationSign(calc.currentOperator)));
 
-                if (calc.inputValue == "0")
-                    calc.inputValue = inputKey;
-                else
-                    calc.inputValue += inputKey;                
+                // If inputValue is zero then replace inputValue with the number, otherwise add the new number
+                calc.inputValue = calc.inputValue == "0" ? inputKey : calc.inputValue + inputKey;
 
+                // Set current result initially as the first split value from the outputValue
                 string currentResultValue = splitOutputValue[0];
 
+                // Add minus sign in the beginning if current result value is empty and operator is minus 
                 if (calc.currentOperator == Calculator.Operator.MINUS & string.IsNullOrEmpty(currentResultValue)) {                    
                     currentResultValue = calc.GetOperationSign(Calculator.Operator.MINUS) + splitOutputValue[1];
                 }
 
+                // Replace output value with the temporary current result value together with current operator sign and input value
                 calc.outputValue = currentResultValue + calc.GetOperationSign(calc.currentOperator) + calc.inputValue;
             } else {
+                // Otherwise add the number to input value
                 calc.inputValue += inputKey;
+                // Replace output value with the new input value
                 calc.outputValue = calc.inputValue;
             }
 
-            calc.isEqual = false; // Fix for example 2.3 + 5 = .
+            // Equal button has not been pressed
+            calc.isEqual = false;
 
+            // Display the output
             DisplayOutput(calc.outputValue);
 
             if (_DEBUG)        
@@ -163,36 +173,44 @@ namespace SOJO_Mini_Calculator
             if (_DEBUG)        
                 Debug.Print("Decimal(before) : inputValue=" + calc.inputValue + ", outputValue=" + calc.outputValue + ", Display=" + Display.Text + ", currentOperation=" + calc.GetOperationSign(calc.currentOperator) + ", hasResult=" + calc.hasResult + ", hasOperator=" + calc.hasOperator);
 
-            if (calc.hasResult) {
+            if (calc.hasResult) { // Calculation has result
+                // Reset all values
                 calc.ResetValues();
-            } else {
+            } else { // Calculation has no result
+                // Get first and second value from the output
                 string[] splitOutputValue = calc.outputValue.Split(Conversions.ToChar(calc.GetOperationSign(calc.currentOperator)));
 
-                if (calc.hasOperator) {
+                if (calc.hasOperator) { // Calculation has operator
+                    // Set output value to the first split output value plus the current operator sign
                     calc.outputValue = splitOutputValue[0] + calc.GetOperationSign(calc.currentOperator);
+                    // Set input value to the second split output value
                     calc.inputValue = splitOutputValue[1];
-                } else {
+                } else { // Otherwise if calculation has no operator
+                    // Set output value to a empty string
                     calc.outputValue = "";
 
-                    // Fix for example 2.3 + 5 = .
-                    if (calc.isEqual)
-                        calc.inputValue = "";
-                    else
-                        calc.inputValue = splitOutputValue[0];
+                    // If equal has been pressed before this button then replace inputValue with the a empty string, otherwise add the first split value                                        
+                    calc.inputValue = calc.isEqual ? "" : splitOutputValue[0];
                 }
 
+                // Check if input value already contains a decimal otherwise add the decimal separator
                 if (!calc.inputValue.Contains(DECIMAL_SEPARATOR)) {
                     calc.inputValue += DECIMAL_SEPARATOR;
                 }
             }
 
+            // Add a zero before the decimal separator if the input value begins with a decimal
             if (calc.inputValue.StartsWith(DECIMAL_SEPARATOR))
                 calc.inputValue = "0" + calc.inputValue;
 
+            // Add the decimal and the result of input value to the output value
             calc.outputValue += calc.inputValue;
 
-            calc.isEqual = false; // Fix for example 2.3 + 5 = .
+            // Equal button has not been pressed
+            calc.isEqual = false;
 
+
+            // Display the output
             DisplayOutput(calc.outputValue);
 
             if (_DEBUG)   

@@ -14,9 +14,8 @@ namespace SOJO_Mini_Calculator
         // Status indicator if equal button or another calculation has presented a total result
         public bool hasResult;
 
-        // Variables holding current and previous operations
+        // Variables holding current operations
         public Calculator.Operator currentOperator = Calculator.Operator.NONE;
-
         public bool hasOperator;
 
         // Variables holding the result and input values
@@ -28,7 +27,8 @@ namespace SOJO_Mini_Calculator
         public string inputValue;
         public string outputValue;
 
-        public bool isEqual; // Fix for example 2.3 + 5 = .
+        // Variable for checking if equal has been pressed or not
+        public bool isEqual;
 
         /// <summary>
         /// ========= OPERATORS =========
@@ -96,20 +96,24 @@ namespace SOJO_Mini_Calculator
         // ========= Reset Values =========
         public void ResetValues()
         {
+            // Status indicator if equal button or another calculation has presented a total result
             hasResult = false;
 
+            // Variables holding current operations
             currentOperator = Calculator.Operator.NONE;
-
             hasOperator = false;
 
+            // Variables holding the result and input values
             resultValue = 0.0d;
             firstValue = 0.0d;
             secondValue = 0.0d;
 
+            // Variables holding the input and output text
             inputValue = "";
             outputValue = "";
 
-            isEqual = false; // Fix for example 2.3 + 5 = .
+            // Variable for checking if equal has been pressed or not
+            isEqual = false; 
         }
     }
 }
