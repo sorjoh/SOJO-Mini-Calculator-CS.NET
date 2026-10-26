@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Microsoft.VisualBasic.CompilerServices;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using Microsoft.VisualBasic.CompilerServices;
+using static SOJO_Mini_Calculator.Calculator;
 
 namespace SOJO_Mini_Calculator
 {
@@ -39,24 +40,8 @@ namespace SOJO_Mini_Calculator
         // Max length of the display numbers
         private const int MAX_OUTPUT_LENGTH = 13;
 
-        // Status indicator if equal button or another calculation has presented a total result
-        private bool hasResult;
-
-        // Variables holding current and previous operations
-        private Calculator.Operator currentOperator = Calculator.Operator.NONE;
-
-        private bool hasOperator;
-
-        // Variables holding the result and input values
-        private double resultValue;
-        private double firstValue;
-        private double secondValue;
-
-        // Variables holding the input and output text
-        private string inputValue;
-        private string outputValue;
-
-        private bool isEqual; //Bugfix for 2.3 + 5 = .
+        // Variable for Calculator methods and variables
+        Calculator calc;
 
         // Get decimal seperator
         private static readonly string DECIMAL_SEPARATOR = System.Globalization.CultureInfo.CurrentCulture.NumberFormat.NumberDecimalSeparator;
@@ -113,13 +98,16 @@ namespace SOJO_Mini_Calculator
                 }                
             }
 
-            // Set the operator sign for operator buttons
-            Plus.Text = Conversions.ToString(Calculator.GetOperationSign(Calculator.Operator.PLUS));
-            Minus.Text = Conversions.ToString(Calculator.GetOperationSign(Calculator.Operator.MINUS));
-            Multiply.Text = Conversions.ToString(Calculator.GetOperationSign(Calculator.Operator.MULTIPLY));
-            Divide.Text = Conversions.ToString(Calculator.GetOperationSign(Calculator.Operator.DIVIDE));
+            // Initialize Calculator
+            calc = new Calculator();
 
-            ResetValues();
+            // Set the operator sign for operator buttons
+            Plus.Text = Conversions.ToString(calc.GetOperationSign(Calculator.Operator.PLUS));
+            Minus.Text = Conversions.ToString(calc.GetOperationSign(Calculator.Operator.MINUS));
+            Multiply.Text = Conversions.ToString(calc.GetOperationSign(Calculator.Operator.MULTIPLY));
+            Divide.Text = Conversions.ToString(calc.GetOperationSign(Calculator.Operator.DIVIDE));
+
+            calc.ResetValues();
             
             DisplayOutput();
         }
@@ -131,84 +119,84 @@ namespace SOJO_Mini_Calculator
             // Get the current selected button
             Button btn = (Button)sender;
 
-            if (_DEBUG)
-                Debug.Print(Conversions.ToString(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject("Number(before) : button=" + btn.Text + ", inputValue=" + inputValue + ", outputValue=" + outputValue + ", Display=" + Display.Text + ", currentOperation=", Calculator.GetOperationSign(currentOperator)), ", hasResult="), hasResult), ", hasOperator="), hasOperator)));
+            if (_DEBUG)                
+                Debug.Print("Number(before) : button=" + btn.Text + ", inputValue=" + calc.inputValue + ", outputValue=" + calc.outputValue + ", Display=" + Display.Text + ", currentOperation=" + calc.GetOperationSign(calc.currentOperator) + ", hasResult=" + calc.hasResult + ", hasOperator=" + calc.hasOperator);
 
             string inputKey = btn.Text;
 
-            if (hasResult) {
-                ResetValues();
-                inputValue = inputKey;
-                outputValue = inputValue;
-            } else if (hasOperator) {
-                string[] splittedOutputValue = outputValue.Split(Conversions.ToChar(Calculator.GetOperationSign(currentOperator)));
+            if (calc.hasResult) {
+                calc.ResetValues();
+                calc.inputValue = inputKey;
+                calc.outputValue = calc.inputValue;
+            } else if (calc.hasOperator) {
+                string[] splitOutputValue = calc.outputValue.Split(Conversions.ToChar(calc.GetOperationSign(calc.currentOperator)));
 
-                if (inputValue == "0")
-                    inputValue = inputKey;
+                if (calc.inputValue == "0")
+                    calc.inputValue = inputKey;
                 else
-                    inputValue += inputKey;                
+                    calc.inputValue += inputKey;                
 
-                string currentResultValue = splittedOutputValue[0];
+                string currentResultValue = splitOutputValue[0];
 
-                if (currentOperator == Calculator.Operator.MINUS & string.IsNullOrEmpty(currentResultValue)) {
-                    currentResultValue = Conversions.ToString(Operators.ConcatenateObject(Calculator.GetOperationSign(Calculator.Operator.MINUS), splittedOutputValue[1]));
+                if (calc.currentOperator == Calculator.Operator.MINUS & string.IsNullOrEmpty(currentResultValue)) {                    
+                    currentResultValue = calc.GetOperationSign(Calculator.Operator.MINUS) + splitOutputValue[1];
                 }
 
-                outputValue = Conversions.ToString(Operators.ConcatenateObject(Operators.ConcatenateObject(currentResultValue, Calculator.GetOperationSign(currentOperator)), inputValue));
+                calc.outputValue = currentResultValue + calc.GetOperationSign(calc.currentOperator) + calc.inputValue;
             } else {
-                inputValue += inputKey;
-                outputValue = inputValue;
+                calc.inputValue += inputKey;
+                calc.outputValue = calc.inputValue;
             }
 
-            isEqual = false; //Bugfix for 2.3 + 5 = .
+            calc.isEqual = false; // Fix for example 2.3 + 5 = .
 
-            DisplayOutput(outputValue);
+            DisplayOutput(calc.outputValue);
 
-            if (_DEBUG)
-                Debug.Print(Conversions.ToString(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject("Number(after) : button=" + btn.Text + ", inputValue=" + inputValue + ", outputValue=" + outputValue + ", Display=" + Display.Text + ", currentOperation=", Calculator.GetOperationSign(currentOperator)), ", hasResult="), hasResult), ", hasOperator="), hasOperator)));
+            if (_DEBUG)        
+                Debug.Print("Number(after) : button=" + inputKey + ", inputValue=" + calc.inputValue + ", outputValue=" + calc.outputValue + ", Display=" + Display.Text + ", currentOperation=" + calc.GetOperationSign(calc.currentOperator) + ", hasResult=" + calc.hasResult + ", hasOperator=" + calc.hasOperator);
         }
 
 
         // ========= DECIMAL INPUT =========
         private void DecimalInput_Click(object sender, EventArgs e)
         {
-            if (_DEBUG)
-                Debug.Print(Conversions.ToString(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject("Decimal(before) : inputValue=" + inputValue + ", outputValue=" + outputValue + ", Display=" + Display.Text + ", currentOperation=", Calculator.GetOperationSign(currentOperator)), ", hasResult="), hasResult), ", hasOperator="), hasOperator)));
+            if (_DEBUG)        
+                Debug.Print("Decimal(before) : inputValue=" + calc.inputValue + ", outputValue=" + calc.outputValue + ", Display=" + Display.Text + ", currentOperation=" + calc.GetOperationSign(calc.currentOperator) + ", hasResult=" + calc.hasResult + ", hasOperator=" + calc.hasOperator);
 
-            if (hasResult) {
-                ResetValues();
+            if (calc.hasResult) {
+                calc.ResetValues();
             } else {
-                string[] splittedOutputValue = outputValue.Split(Conversions.ToChar(Calculator.GetOperationSign(currentOperator)));
+                string[] splitOutputValue = calc.outputValue.Split(Conversions.ToChar(calc.GetOperationSign(calc.currentOperator)));
 
-                if (hasOperator) {
-                    outputValue = Conversions.ToString(Operators.ConcatenateObject(splittedOutputValue[0], Calculator.GetOperationSign(currentOperator)));
-                    inputValue = splittedOutputValue[1];
+                if (calc.hasOperator) {
+                    calc.outputValue = splitOutputValue[0] + calc.GetOperationSign(calc.currentOperator);
+                    calc.inputValue = splitOutputValue[1];
                 } else {
-                    outputValue = "";
+                    calc.outputValue = "";
 
-                    //Bugfix for 2.3 + 5 = .
-                    if (isEqual)
-                        inputValue = "";
+                    // Fix for example 2.3 + 5 = .
+                    if (calc.isEqual)
+                        calc.inputValue = "";
                     else
-                        inputValue = splittedOutputValue[0];
+                        calc.inputValue = splitOutputValue[0];
                 }
 
-                if (!inputValue.Contains(DECIMAL_SEPARATOR)) {
-                    inputValue += DECIMAL_SEPARATOR;
+                if (!calc.inputValue.Contains(DECIMAL_SEPARATOR)) {
+                    calc.inputValue += DECIMAL_SEPARATOR;
                 }
             }
 
-            if (inputValue.StartsWith(DECIMAL_SEPARATOR))
-                inputValue = "0" + inputValue;
+            if (calc.inputValue.StartsWith(DECIMAL_SEPARATOR))
+                calc.inputValue = "0" + calc.inputValue;
 
-            outputValue += inputValue;
+            calc.outputValue += calc.inputValue;
 
-            isEqual = false; //Bugfix for 2.3 + 5 = .
+            calc.isEqual = false; // Fix for example 2.3 + 5 = .
 
-            DisplayOutput(outputValue);
+            DisplayOutput(calc.outputValue);
 
-            if (_DEBUG)
-                Debug.Print(Conversions.ToString(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject("Decimal(after) : inputValue=" + inputValue + ", outputValue=" + outputValue + ", Display=" + Display.Text + ", currentOperation=", Calculator.GetOperationSign(currentOperator)), ", hasResult="), hasResult), ", hasOperator="), hasOperator)));
+            if (_DEBUG)   
+                Debug.Print("Decimal(after) : inputValue=" + calc.inputValue + ", outputValue=" + calc.outputValue + ", Display=" + Display.Text + ", currentOperation=" + calc.GetOperationSign(calc.currentOperator) + ", hasResult=" + calc.hasResult + ", hasOperator=" + calc.hasOperator);
         }
 
 
@@ -218,55 +206,59 @@ namespace SOJO_Mini_Calculator
             // Get the current selected button
             Button btn = (Button)sender;
 
-            if (_DEBUG)
-                Debug.Print(Conversions.ToString(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject("Operator(before) : button=" + btn.Text + ", inputValue=" + inputValue + ", outputValue=" + outputValue + ", Display=" + Display.Text + ", currentOperation=", Calculator.GetOperationSign(currentOperator)), ", hasResult="), hasResult), ", hasOperator="), hasOperator)));
+            if (_DEBUG)        
+                Debug.Print("Operator(before) : button=" + btn.Text + ", inputValue=" + calc.inputValue + ", outputValue=" + calc.outputValue + ", Display=" + Display.Text + ", currentOperation=" + calc.GetOperationSign(calc.currentOperator) + ", hasResult=" + calc.hasResult + ", hasOperator=" + calc.hasOperator);
 
-            var previousOperator = currentOperator;
+            var previousOperator = calc.currentOperator;
 
-            if (hasOperator) {
-                string[] splittedOutputValue = outputValue.Split(Conversions.ToChar(Calculator.GetOperationSign(previousOperator)));
+            if (calc.hasOperator) {
+                string[] splitOutputValue = calc.outputValue.Split(Conversions.ToChar(calc.GetOperationSign(previousOperator)));
 
-                ResetValues();
+                calc.ResetValues();
 
-                outputValue = splittedOutputValue[0];
-                inputValue = splittedOutputValue[1];
+                calc.outputValue = splitOutputValue[0];
+                calc.inputValue = splitOutputValue[1];
 
-                if (previousOperator == Calculator.Operator.MINUS & string.IsNullOrEmpty(outputValue)) {
-                    outputValue = Conversions.ToString(Operators.ConcatenateObject(Calculator.GetOperationSign(Calculator.Operator.MINUS), splittedOutputValue[1]));
-                    inputValue = splittedOutputValue[2];
+                if (previousOperator == Calculator.Operator.MINUS & string.IsNullOrEmpty(calc.outputValue)) {
+                    calc.outputValue = calc.GetOperationSign(Calculator.Operator.MINUS) + splitOutputValue[1];
+                    calc.inputValue = splitOutputValue[2];
                 }
 
-                double.TryParse(outputValue, out firstValue);
-                double.TryParse(inputValue, out secondValue);
+                double.TryParse(calc.outputValue, out calc.firstValue);
+                double.TryParse(calc.inputValue, out calc.secondValue);               
 
-                resultValue = Calculator.Calculate(firstValue, secondValue, previousOperator);
+                // Fix for example 12 * %
+                if (calc.secondValue != 0.0)
+                    calc.resultValue = calc.Calculate(calc.firstValue, calc.secondValue, previousOperator);
+                else
+                    calc.resultValue = calc.firstValue;
 
-                currentOperator = (Calculator.Operator)Conversions.ToInteger(Calculator.GetOperation(btn.Text));
+                calc.currentOperator = calc.GetOperation(btn.Text);
 
-                inputValue = "";
-                outputValue = Conversions.ToString(Operators.ConcatenateObject(resultValue, Calculator.GetOperationSign(currentOperator)));
-            } else if (string.IsNullOrEmpty(outputValue)) {
-                ResetValues();
+                calc.inputValue = "";
+                calc.outputValue = calc.resultValue + calc.GetOperationSign(calc.currentOperator);
+            } else if (string.IsNullOrEmpty(calc.outputValue)) {
+                calc.ResetValues();
 
-                currentOperator = (Calculator.Operator)Conversions.ToInteger(Calculator.GetOperation(btn.Text));
+                calc.currentOperator = calc.GetOperation(btn.Text);
 
-                inputValue = "0";
-                outputValue = Conversions.ToString(Operators.ConcatenateObject(inputValue, Calculator.GetOperationSign(currentOperator)));
+                calc.inputValue = "0";
+                calc.outputValue = calc.inputValue + calc.GetOperationSign(calc.currentOperator);
             } else {
-                currentOperator = (Calculator.Operator)Conversions.ToInteger(Calculator.GetOperation(btn.Text));
+                calc.currentOperator = calc.GetOperation(btn.Text);
 
-                inputValue = "";
-                outputValue = Conversions.ToString(outputValue + Calculator.GetOperationSign(currentOperator));
+                calc.inputValue = "";
+                calc.outputValue = calc.outputValue + calc.GetOperationSign(calc.currentOperator);
             }
 
-            hasOperator = true;
+            calc.hasOperator = true;
 
-            isEqual = false; //Bugfix for 2.3 + 5 = .
+            calc.isEqual = false; // Fix for example 2.3 + 5 = .
 
-            DisplayOutput(outputValue);
+            DisplayOutput(calc.outputValue);
 
             if (_DEBUG)
-                Debug.Print(Conversions.ToString(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject("Operator(after) : button=" + btn.Text + ", resultValue=" + resultValue + ", firstValue=" + firstValue + ", secondValue=" + secondValue + ", inputValue=" + inputValue + ", outputValue=" + outputValue + ", Display=" + Display.Text + ", currentOperation=", Calculator.GetOperationSign(currentOperator)), ", hasResult="), hasResult), ", hasOperator="), hasOperator)));
+                Debug.Print("Operator(after) : button=" + btn.Text + ", resultValue=" + calc.resultValue + ", firstValue=" + calc.firstValue + ", secondValue=" + calc.secondValue + ", inputValue=" + calc.inputValue + ", outputValue=" + calc.outputValue + ", Display=" + Display.Text + ", currentOperation=" + calc.GetOperationSign(calc.currentOperator) + ", hasResult=" + calc.hasResult + ", hasOperator=" + calc.hasOperator);
         }
 
 
@@ -274,41 +266,54 @@ namespace SOJO_Mini_Calculator
         private void Equal_Click(object sender, EventArgs e)
         {
             if (_DEBUG)
-                Debug.Print(Conversions.ToString(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject("Equal(before) : inputValue=" + inputValue + ", outputValue=" + outputValue + ", Display=" + Display.Text + ", currentOperation=", Calculator.GetOperationSign(currentOperator)), ", hasResult="), hasResult)));
+                Debug.Print("Equal(before) : inputValue=" + calc.inputValue + ", outputValue=" + calc.outputValue + ", Display=" + Display.Text + ", currentOperation=" + calc.GetOperationSign(calc.currentOperator) + ", hasResult=" + calc.hasResult);
 
-            string[] splittedOutputValue = outputValue.Split(Conversions.ToChar(Calculator.GetOperationSign(currentOperator)));
+            string[] splitOutputValue = calc.outputValue.Split(Conversions.ToChar(calc.GetOperationSign(calc.currentOperator)));
 
-            outputValue = splittedOutputValue[0];
+            calc.outputValue = splitOutputValue[0];
 
             try {
-                if (currentOperator == Calculator.Operator.MINUS & string.IsNullOrEmpty(outputValue)) {
-                    outputValue = Conversions.ToString(Operators.ConcatenateObject(Calculator.GetOperationSign(Calculator.Operator.MINUS), splittedOutputValue[1]));
-                    inputValue = splittedOutputValue[2];
+                if (calc.currentOperator == Calculator.Operator.MINUS & string.IsNullOrEmpty(calc.outputValue)) {
+                    calc.outputValue = calc.GetOperationSign(Calculator.Operator.MINUS) + splitOutputValue[1];
+                    calc.inputValue = splitOutputValue[2];
                 } else {
-                    inputValue = splittedOutputValue[1];
+                    calc.inputValue = splitOutputValue[1];
                 }
             } catch (Exception) {
-                ResetValues();
+                String tmpOutputValue;
+
+                // Fix for example 22 =
+                if (!calc.isEqual)
+                    tmpOutputValue = calc.outputValue;
+                else
+                    tmpOutputValue = "";
+
+                calc.ResetValues();
+
+                calc.outputValue = tmpOutputValue;
             }
 
-            double.TryParse(outputValue, out firstValue);
-            double.TryParse(inputValue, out secondValue);
+            double.TryParse(calc.outputValue, out calc.firstValue);
+            double.TryParse(calc.inputValue, out calc.secondValue);
 
-            resultValue = Calculator.Calculate(firstValue, secondValue, currentOperator);
+            if (calc.hasOperator)
+                calc.resultValue = calc.Calculate(calc.firstValue, calc.secondValue, calc.currentOperator);
+            else
+                double.TryParse(calc.outputValue, out calc.resultValue);
 
-            inputValue = "";
-            outputValue = resultValue.ToString();
+            calc.inputValue = "";
+            calc.outputValue = calc.resultValue.ToString();
 
-            currentOperator = Calculator.Operator.NONE;
-            hasOperator = false;
-            hasResult = false;
+            calc.currentOperator = Calculator.Operator.NONE;
+            calc.hasOperator = false;
+            calc.hasResult = false;
 
-            isEqual = true; //Bugfix for 2.3 + 5 = .
+            calc.isEqual = true; // Fix for example 2.3 + 5 = .
 
-            DisplayOutput(outputValue);
+            DisplayOutput(calc.outputValue);
 
             if (_DEBUG)
-                Debug.Print(Conversions.ToString(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject("Equal(after) : inputValue=" + inputValue + ", outputValue=" + outputValue + ", Display=" + Display.Text + ", currentOperation=", Calculator.GetOperationSign(currentOperator)), ", hasResult="), hasResult)));
+                Debug.Print("Equal(before) : inputValue=" + calc.inputValue + ", outputValue=" + calc.outputValue + ", Display=" + Display.Text + ", currentOperation=" + calc.GetOperationSign(calc.currentOperator) + ", hasResult=" + calc.hasResult);
         }
 
 
@@ -339,10 +344,10 @@ namespace SOJO_Mini_Calculator
             switch (key) {
                 case '+': case '-':  case '*': case '/': {
                     btn.Text = key switch {
-                        '+' => Conversions.ToString(Calculator.GetOperationSign(Calculator.Operator.PLUS)),
-                        '-' => Conversions.ToString(Calculator.GetOperationSign(Calculator.Operator.MINUS)),
-                        '*' => Conversions.ToString(Calculator.GetOperationSign(Calculator.Operator.MULTIPLY)),
-                        '/' => Conversions.ToString(Calculator.GetOperationSign(Calculator.Operator.DIVIDE)),
+                        '+' => calc.GetOperationSign(Calculator.Operator.PLUS),
+                        '-' => calc.GetOperationSign(Calculator.Operator.MINUS),
+                        '*' => calc.GetOperationSign(Calculator.Operator.MULTIPLY),
+                        '/' => calc.GetOperationSign(Calculator.Operator.DIVIDE),
                         _ => btn.Text = ""
                     };
 
@@ -373,25 +378,25 @@ namespace SOJO_Mini_Calculator
         {
             switch (e.KeyCode) {
                 case Keys.Multiply: {
-                        OperatorInput_Click(new Button() { Text = Conversions.ToString(Calculator.GetOperationSign(Calculator.Operator.MULTIPLY)) }, null);
+                        OperatorInput_Click(new Button() { Text = calc.GetOperationSign(Calculator.Operator.MULTIPLY) }, null);
                         e.Handled = true;
                         break;
                 }
 
                 case Keys.Divide: {
-                        OperatorInput_Click(new Button() { Text = Conversions.ToString(Calculator.GetOperationSign(Calculator.Operator.DIVIDE)) }, null);
+                        OperatorInput_Click(new Button() { Text = calc.GetOperationSign(Calculator.Operator.DIVIDE) }, null);
                         e.Handled = true;
                         break;
                 }
 
                 case Keys.Add: {
-                        OperatorInput_Click(new Button() { Text = Conversions.ToString(Calculator.GetOperationSign(Calculator.Operator.PLUS)) }, null);
+                        OperatorInput_Click(new Button() { Text = calc.GetOperationSign(Calculator.Operator.PLUS) }, null);
                         e.Handled = true;
                         break;
                 }
 
                 case Keys.Subtract: {
-                        OperatorInput_Click(new Button() { Text = Conversions.ToString(Calculator.GetOperationSign(Calculator.Operator.MINUS)) }, null);
+                        OperatorInput_Click(new Button() { Text = calc.GetOperationSign(Calculator.Operator.MINUS) }, null);
                         e.Handled = true;
                         break;
                 }
@@ -409,28 +414,28 @@ namespace SOJO_Mini_Calculator
         private void Delete()
         {
             if (_DEBUG)
-                Debug.Print(Conversions.ToString(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject("Delete(before) : inputValue=" + inputValue + ", outputValue=" + outputValue + ", Display=" + Display.Text + ", currentOperation=", Calculator.GetOperationSign(currentOperator)), ", hasResult="), hasResult)));
+                Debug.Print("Delete(before) : inputValue=" + calc.inputValue + ", outputValue=" + calc.outputValue + ", Display=" + Display.Text + ", currentOperation=" + calc.GetOperationSign(calc.currentOperator) + ", hasResult=" + calc.hasResult);
 
-            if (hasResult & hasOperator == false) {
-                ResetValues();
+            if (calc.hasResult & calc.hasOperator == false) {
+                calc.ResetValues();
                 DisplayOutput("0");
                 return;
             }
 
             // Delete number from the end if no calculation has been made
             try {
-                outputValue = outputValue.Substring(0, outputValue.Length - 1).Trim();
+                calc.outputValue = calc.outputValue.Substring(0, calc.outputValue.Length - 1).Trim();
 
-                string[] splittedValues = outputValue.Split(Conversions.ToChar(Calculator.GetOperationSign(currentOperator)));
+                string[] splitValues = calc.outputValue.Split(Conversions.ToChar(calc.GetOperationSign(calc.currentOperator)));
 
-                if (splittedValues.Length > 1) {
-                    inputValue = splittedValues[1];
+                if (splitValues.Length > 1) {
+                    calc.inputValue = splitValues[1];
                 } else {
-                    inputValue = outputValue;
+                    calc.inputValue = calc.outputValue;
 
-                    hasResult = false;
-                    hasOperator = false;
-                    currentOperator = Calculator.Operator.NONE;
+                    calc.hasResult = false;
+                    calc.hasOperator = false;
+                    calc.currentOperator = Calculator.Operator.NONE;
                 }
             }
             catch (Exception e) {
@@ -438,40 +443,20 @@ namespace SOJO_Mini_Calculator
             }
 
             // If the value is empty replaces it with a zero
-            if (string.IsNullOrEmpty(outputValue.Trim())) {
-                ResetValues();
-                outputValue = "0";
+            if (string.IsNullOrEmpty(calc.outputValue.Trim())) {
+                calc.ResetValues();
+                calc.outputValue = "0";
             }
 
             if (_DEBUG)
-                Debug.Print(Conversions.ToString(Operators.ConcatenateObject(Operators.ConcatenateObject(Operators.ConcatenateObject("Delete(after) : inputValue=" + inputValue + ", outputValue=" + outputValue + ", Display=" + Display.Text + ", currentOperation=", Calculator.GetOperationSign(currentOperator)), ", hasResult="), hasResult)));
+                Debug.Print("Delete(after) : inputValue=" + calc.inputValue + ", outputValue=" + calc.outputValue + ", Display=" + Display.Text + ", currentOperation=" + calc.GetOperationSign(calc.currentOperator) + ", hasResult=" + calc.hasResult);
 
-            isEqual = false; //Bugfix for 2.3 + 5 = .
+            calc.isEqual = false; // Fix for example 2.3 + 5 = .
 
-            DisplayOutput(outputValue);
+            DisplayOutput(calc.outputValue);
         }
 
-
-        // ========= Reset Values =========
-        private void ResetValues()
-        {
-            hasResult = false;
-
-            currentOperator = Calculator.Operator.NONE;
-
-            hasOperator = false;
-
-            resultValue = 0.0d;
-            firstValue = 0.0d;
-            secondValue = 0.0d;
-
-            inputValue = "";
-            outputValue = "";
-
-            isEqual = false; //Bugfix for 2.3 + 5 = .
-        }
-
-
+         
         // ========= Display Output =========
         private void DisplayOutput(string output = "0")
         {

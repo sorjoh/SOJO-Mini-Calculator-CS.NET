@@ -11,6 +11,25 @@ namespace SOJO_Mini_Calculator
 
     public class Calculator
    {
+        // Status indicator if equal button or another calculation has presented a total result
+        public bool hasResult;
+
+        // Variables holding current and previous operations
+        public Calculator.Operator currentOperator = Calculator.Operator.NONE;
+
+        public bool hasOperator;
+
+        // Variables holding the result and input values
+        public double resultValue;
+        public double firstValue;
+        public double secondValue;
+
+        // Variables holding the input and output text
+        public string inputValue;
+        public string outputValue;
+
+        public bool isEqual; // Fix for example 2.3 + 5 = .
+
         /// <summary>
         /// ========= OPERATORS =========
         /// </summary>
@@ -28,7 +47,7 @@ namespace SOJO_Mini_Calculator
         /// </summary>
         /// <param name="op"></param>
         /// <returns></returns>
-        public static string GetOperationSign(Operator op)
+        public string GetOperationSign(Operator op)
         {
             return op switch {
                 Operator.PLUS => "+",
@@ -45,7 +64,7 @@ namespace SOJO_Mini_Calculator
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public static Operator GetOperation(string key)
+        public Operator GetOperation(string key)
         {
             return key switch {
                 "+" => Operator.PLUS,
@@ -63,7 +82,7 @@ namespace SOJO_Mini_Calculator
         /// <param name="secondValue"></param>
         /// <param name="operation"></param>
         /// <returns></returns>
-        public static double Calculate(double firstValue, double secondValue, Operator operation)
+        public double Calculate(double firstValue, double secondValue, Operator operation)
         {
             return operation switch {
                 Operator.PLUS => firstValue + secondValue,
@@ -72,6 +91,25 @@ namespace SOJO_Mini_Calculator
                 Operator.DIVIDE => firstValue / secondValue,
                 _ => firstValue
             };            
+        }
+
+        // ========= Reset Values =========
+        public void ResetValues()
+        {
+            hasResult = false;
+
+            currentOperator = Calculator.Operator.NONE;
+
+            hasOperator = false;
+
+            resultValue = 0.0d;
+            firstValue = 0.0d;
+            secondValue = 0.0d;
+
+            inputValue = "";
+            outputValue = "";
+
+            isEqual = false; // Fix for example 2.3 + 5 = .
         }
     }
 }
