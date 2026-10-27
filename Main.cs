@@ -228,8 +228,7 @@ namespace SOJO_Mini_Calculator
 
             // Save current operator as previous operator
             var previousOperator = calc.currentOperator;
-
-            // 
+                        
             if (calc.hasOperator) { // Calculation has operator
                 // Get first and second value from the output
                 string[] splitOutputValue = calc.outputValue.Split(Conversions.ToChar(calc.GetOperationSign(previousOperator)));
@@ -244,12 +243,15 @@ namespace SOJO_Mini_Calculator
 
                 // Add minus sign in the beginning if current output value is empty and previous operator is minus 
                 if (previousOperator == Calculator.Operator.MINUS & string.IsNullOrEmpty(calc.outputValue)) {
+                    // Set output value to the second split output value
                     calc.outputValue = calc.GetOperationSign(Calculator.Operator.MINUS) + splitOutputValue[1];
+                    // Set input value to the third split output value
                     calc.inputValue = splitOutputValue[2];
                 }
 
                 // Set firstValue as double value of outputValue
                 double.TryParse(calc.outputValue, out calc.firstValue);
+
                 // Set secondValue as double value of inputValue
                 double.TryParse(calc.inputValue, out calc.secondValue);
 
@@ -268,26 +270,38 @@ namespace SOJO_Mini_Calculator
                 // Set input value to an empty string
                 calc.inputValue = "";
 
-
+                // Replace output value with the result plus the current operator sign
                 calc.outputValue = calc.resultValue + calc.GetOperationSign(calc.currentOperator);
-            } else if (string.IsNullOrEmpty(calc.outputValue)) {
+            } else if (string.IsNullOrEmpty(calc.outputValue)) { // Output value is empty
+                // Reset values
                 calc.ResetValues();
 
+                // Set current operator
                 calc.currentOperator = calc.GetOperation(btn.Text);
 
+                // Set input value to zero
                 calc.inputValue = "0";
+
+                // Replace output value with the input value plus the current operator sign
                 calc.outputValue = calc.inputValue + calc.GetOperationSign(calc.currentOperator);
-            } else {
+            } else { // Calculation has no operator and output value is not empty
+                // Set current operator
                 calc.currentOperator = calc.GetOperation(btn.Text);
 
+                // Set input value to a empty string
                 calc.inputValue = "";
+
+                // Add the current operator sign to output value
                 calc.outputValue = calc.outputValue + calc.GetOperationSign(calc.currentOperator);
             }
 
+            // Tell the app that a operator is present
             calc.hasOperator = true;
 
-            calc.isEqual = false; // Fix for example 2.3 + 5 = .
+            // Equal button has not been pressed
+            calc.isEqual = false;
 
+            // Display the output
             DisplayOutput(calc.outputValue);
 
             if (_DEBUG)
@@ -301,48 +315,71 @@ namespace SOJO_Mini_Calculator
             if (_DEBUG)
                 Debug.Print("Equal(before) : inputValue=" + calc.inputValue + ", outputValue=" + calc.outputValue + ", Display=" + Display.Text + ", currentOperation=" + calc.GetOperationSign(calc.currentOperator) + ", hasResult=" + calc.hasResult);
 
+            // Get first and second value from the output
             string[] splitOutputValue = calc.outputValue.Split(Conversions.ToChar(calc.GetOperationSign(calc.currentOperator)));
 
+            // Set output value to the first split output value
             calc.outputValue = splitOutputValue[0];
 
             try {
+                // Add minus sign in the beginning if current output value is empty and current operator is minus
                 if (calc.currentOperator == Calculator.Operator.MINUS & string.IsNullOrEmpty(calc.outputValue)) {
+                    // Set output value to the second split output value
                     calc.outputValue = calc.GetOperationSign(Calculator.Operator.MINUS) + splitOutputValue[1];
+                    // Set input value to the third split output value
                     calc.inputValue = splitOutputValue[2];
-                } else {
+                } else {  // Otherwise set input value to the second split output value                   
                     calc.inputValue = splitOutputValue[1];
                 }
             } catch (Exception) {
                 String tmpOutputValue;
 
-                // Fix for example 22 =
-                if (!calc.isEqual)
-                    tmpOutputValue = calc.outputValue;
-                else
+                // Reset all values if Equal been pressed twice, otherwise reset all values except for the output value
+                if (calc.isEqual)
                     tmpOutputValue = "";
-
+                else
+                    tmpOutputValue = calc.outputValue; // Save the output value
+                
+                // Reset values
                 calc.ResetValues();
 
+                // Restore the output value if needed
                 calc.outputValue = tmpOutputValue;
             }
 
+            // Set firstValue as double value of outputValue
             double.TryParse(calc.outputValue, out calc.firstValue);
+
+            // Set secondValue as double value of inputValue
             double.TryParse(calc.inputValue, out calc.secondValue);
 
-            if (calc.hasOperator)
+            if (calc.hasOperator) { // Calculation has operator
+                // Calculate the result
                 calc.resultValue = calc.Calculate(calc.firstValue, calc.secondValue, calc.currentOperator);
-            else
+            } else {
+                // Set resultValue as double value of outputValue
                 double.TryParse(calc.outputValue, out calc.resultValue);
+            }
 
+            // Set input value to an empty string
             calc.inputValue = "";
+
+            // Convert result value to string
             calc.outputValue = calc.resultValue.ToString();
 
+            // Set current operator to none
             calc.currentOperator = Calculator.Operator.NONE;
+
+            // No operator is used
             calc.hasOperator = false;
+
+            // Set a flag that no result has been calculated, even if it has been done
             calc.hasResult = false;
 
-            calc.isEqual = true; // Fix for example 2.3 + 5 = .
+            // Tell the app that equal has been pressed
+            calc.isEqual = true;
 
+            // Display the output
             DisplayOutput(calc.outputValue);
 
             if (_DEBUG)
@@ -493,8 +530,10 @@ namespace SOJO_Mini_Calculator
         // ========= Display Output =========
         private void DisplayOutput(string output = "0")
         {
+            // Display the output
             Display.Text = output;
 
+            // Unfocus the keys
             Display.Select();
         }
 
