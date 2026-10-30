@@ -256,12 +256,12 @@ namespace SOJO_Mini_Calculator
                 double.TryParse(calc.inputValue, out calc.secondValue);
 
                 // Calculate the result if second value is present
-                if (calc.secondValue != 0.0) {
+                if (calc.secondValue == 0.0) {
+                    // Set result value to the first value
+                    calc.resultValue = calc.firstValue;                    
+                } else {
                     // Calculate the result
                     calc.resultValue = calc.Calculate(calc.firstValue, calc.secondValue, previousOperator);
-                } else {
-                    // Set result value to the first value
-                    calc.resultValue = calc.firstValue;
                 }
 
                 // Get the current operator
