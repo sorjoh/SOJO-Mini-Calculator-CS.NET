@@ -331,14 +331,9 @@ namespace SOJO_Mini_Calculator
                 } else {  // Otherwise set input value to the second split output value                   
                     calc.inputValue = splitOutputValue[1];
                 }
-            } catch (Exception) {
-                String tmpOutputValue;
-
+            } catch (Exception) {               
                 // Reset all values if Equal been pressed twice, otherwise reset all values except for the output value
-                if (calc.isEqual)
-                    tmpOutputValue = "";
-                else
-                    tmpOutputValue = calc.outputValue; // Save the output value
+                String tmpOutputValue = calc.isEqual ? "" : calc.outputValue; // Save outputValue if needed   
                 
                 // Reset values
                 calc.ResetValues();
