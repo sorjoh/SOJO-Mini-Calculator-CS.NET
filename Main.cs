@@ -19,7 +19,7 @@ namespace SOJO_Mini_Calculator
     public partial class Main
     {
         // Use debugging if needed
-        private const bool _DEBUG = true;
+        private const bool _DEBUG = false;
 
         // Use rounded controls or not
         private const bool ROUNDED_BUTTON = true;
